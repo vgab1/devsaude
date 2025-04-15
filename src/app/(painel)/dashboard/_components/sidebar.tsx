@@ -23,7 +23,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import logoImg from "../../../../../public/logo-odonto.png";
+import logoImg from "../../../../../public/devsaude.png";
 
 import {
   Collapsible,

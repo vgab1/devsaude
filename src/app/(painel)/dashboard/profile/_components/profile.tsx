@@ -19,11 +19,51 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+
 import Image from "next/image";
 import imgTest from "../../../../../../public/foto1.png";
+import { Button } from "@/components/ui/button";
+import { ArrowRight } from "lucide-react";
+import { useState } from "react";
+import { cn } from "@/lib/utils";
 
 export function ProfileContent() {
+  const [selectedHours, setSelectedHours] = useState<string[]>([]);
+  const [dialogIsOpen, setDialogIsOpen] = useState(false);
+
   const form = useProfileForm();
+
+  function generateTimeSlots(): string[] {
+    const hours: string[] = [];
+
+    for (let i = 8; i <= 24; i++) {
+      for (let j = 0; j < 2; j++) {
+        const hour = i.toString().padStart(2, "0");
+        const minute = (j * 30).toString().padStart(2, "0");
+        hours.push(`${hour}:${minute}`);
+      }
+    }
+
+    return hours;
+  }
+
+  const hours = generateTimeSlots();
+
+  function toggleHour(hour: string) {
+    setSelectedHours((prev) =>
+      prev.includes(hour)
+        ? prev.filter((h) => h !== hour)
+        : [...prev, hour].sort()
+    );
+  }
 
   return (
     <div className="mx-auto">
@@ -98,7 +138,7 @@ export function ProfileContent() {
                   control={form.control}
                   name="status"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem >
                       <FormLabel className="font-semibold">
                         Status da clínica
                       </FormLabel>
@@ -123,6 +163,59 @@ export function ProfileContent() {
                     </FormItem>
                   )}
                 />
+
+                <div className="space-y-2">
+                  <Label className="font-semibold">
+                    Configurar horários da clínica
+                  </Label>
+                  <Dialog open={dialogIsOpen} onOpenChange={setDialogIsOpen}>
+                    <DialogTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="w-full justify-between cursor-pointer"
+                      >
+                        Clique aqui para selecionar os horários
+                        <ArrowRight className="w-5 h-5" />
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Horários da clínica</DialogTitle>
+                        <DialogDescription>
+                          Selecione abaixo os horários de funcionamanto da
+                          clínica:
+                        </DialogDescription>
+                      </DialogHeader>
+                      <section className="py-4">
+                        <p className="text-sm text-muted-foreground mb-2">
+                          Clique nos horários abaixo para marcar ou desmarcar:
+                        </p>
+                        <div className="grid grid-cols-5 gap-2">
+                          {hours.map((hour) => (
+                            <Button
+                              key={hour}
+                              variant="outline"
+                              className={cn(
+                                "h-10",
+                                selectedHours.includes(hour) &&
+                                  "border-2 bg-gray-100 border-emerald-500 text-primary"
+                              )}
+                              onClick={() => toggleHour(hour)}
+                            >
+                              {hour}
+                            </Button>
+                          ))}
+                        </div>
+                      </section>
+                      <Button
+                        className="w-full"
+                        onClick={() => setDialogIsOpen(false)}
+                      >
+                        Fechar modal
+                      </Button>
+                    </DialogContent>
+                  </Dialog>
+                </div>
               </div>
             </CardContent>
           </Card>
