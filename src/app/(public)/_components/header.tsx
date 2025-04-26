@@ -44,7 +44,7 @@ export function Header() {
       ) : session ? (
         <Link
           href="/dashboard"
-          className="flex items-center justify-center gap-2 bg-zinc-900 text-white py-1 rounded-md"
+          className="flex items-center justify-center gap-2 bg-zinc-900 text-white py-1 px-2 rounded-md"
         >
           Acessar clínica
         </Link>
