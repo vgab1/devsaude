@@ -1,5 +1,6 @@
 "use client";
 
+import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import imgTest from "../../../../../../public/foto1.png";
 import { MapPin } from "lucide-react";
@@ -25,6 +26,7 @@ import {
   SelectItem,
   SelectValue,
 } from "@/components/ui/select";
+import { ScheduleTimeList } from "./schedule-time-list";
 
 type UserWithServiceAndSubscription = Prisma.UserGetPayload<{
   include: {
@@ -37,14 +39,65 @@ interface ScheduleContentProps {
   clinic: UserWithServiceAndSubscription;
 }
 
+export interface TimeSlot {
+  time: string;
+  avaliable: boolean;
+}
+
 export function ScheduleContent({ clinic }: ScheduleContentProps) {
   const form = useAppointmentForm();
   const { watch } = form;
 
+  const selectedDate = watch("date");
+  const selectedServiceId = watch("serviceId");
+
+  const [selectedTime, setSelectedTime] = useState("");
+  const [avaliableTimeSlots, setAvaliableTimeSlots] = useState<TimeSlot[]>([]);
+  const [loadingSlots, setLoadingSlots] = useState(false);
+
+  const [blockedTimes, setBlockedTimes] = useState<string[]>([]);
+
+  const fetchBlockedTimes = useCallback(
+    async (date: Date): Promise<string[]> => {
+      setLoadingSlots(true);
+      try {
+        const dateString = date.toISOString().split("T")[0];
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_URL}/api/schedule/get-appointments?userId=${clinic.id}&date=${dateString}`
+        );
+
+        const json = await response.json();
+        setLoadingSlots(false);
+        return json;
+      } catch (err) {
+        console.error(err);
+        setLoadingSlots(false);
+        return [];
+      }
+    },
+    [clinic.id]
+  );
+
+  useEffect(() => {
+    if (selectedDate) {
+      fetchBlockedTimes(selectedDate).then((blocked) => {
+        setBlockedTimes(blocked);
+
+        const times = clinic.times || [];
+
+        const finalSlots = times.map((time) => ({
+          time: time,
+          avaliable: !blocked.includes(time),
+        }));
+
+        setAvaliableTimeSlots(finalSlots);
+      });
+    }
+  }, [selectedDate, clinic.times, fetchBlockedTimes, selectedTime]);
+
   async function handleRegisterAppointment(formData: AppointmentFormData) {
     console.log(formData);
   }
-
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -72,7 +125,10 @@ export function ScheduleContent({ clinic }: ScheduleContentProps) {
       </section>
       <section className="max-w-2xl mx-auto w-full mt-5">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleRegisterAppointment)} className="mx-2 space-y-6 bg-white p-6 border rounded-md shadow-sm">
+          <form
+            onSubmit={form.handleSubmit(handleRegisterAppointment)}
+            className="mx-2 space-y-6 bg-white p-6 border rounded-md shadow-sm"
+          >
             <FormField
               control={form.control}
               name="name"
@@ -184,6 +240,40 @@ export function ScheduleContent({ clinic }: ScheduleContentProps) {
                 </FormItem>
               )}
             />
+
+            {selectedServiceId && (
+              <div className="space-y-2">
+                <Label className="font-semibold">Horários disponíveis:</Label>
+                <div className="bg-gray-100 p-4 rounded-lg">
+                  {loadingSlots ? (
+                    <p>Carregando horários...</p>
+                  ) : avaliableTimeSlots.length === 0 ? (
+                    <p>Nenhum horário disponível</p>
+                  ) : (
+                    <ScheduleTimeList
+                      onSelectTime={(time) => setSelectedTime(time)}
+                      clinicTimes={clinic.times}
+                      blockedTimes={blockedTimes}
+                      availableTimeSlots={avaliableTimeSlots}
+                      selectedTime={selectedTime}
+                      selectedDate={selectedDate}
+                      requiredSlots={
+                        clinic.services.find(
+                          (service) => service.id === selectedServiceId
+                        )
+                          ? Math.ceil(
+                              clinic.services.find(
+                                (service) => service.id === selectedServiceId
+                              )!.duration / 30
+                            )
+                          : 1
+                      }
+                    />
+                  )}
+                </div>
+              </div>
+            )}
+
             {clinic.status ? (
               <Button
                 type="submit"
