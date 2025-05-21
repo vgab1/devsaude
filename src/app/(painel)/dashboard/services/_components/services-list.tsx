@@ -50,7 +50,16 @@ export function ServicesList({ services }: ServicesListProps) {
   }
 
   return (
-    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+    <Dialog
+      open={isDialogOpen}
+      onOpenChange={(open) => {
+        setIsDialogOpen(open);
+
+        if (!open) {
+          setEditingService(null);
+        }
+      }}
+    >
       <section className="mx-auto">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-8 pb-2">
