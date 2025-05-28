@@ -8,6 +8,7 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { subscriptionPlans } from "@/utils/plans";
+import { SubscriptionButton } from "./subscription-button";
 
 export function GridPlans() {
   return (
@@ -42,7 +43,9 @@ export function GridPlans() {
             </div>
           </CardContent>
           <CardFooter>
-            <Button className="w-full bg-black">ATIVAR ASSINATURA</Button>
+            <SubscriptionButton
+              type={plan.id === "BASIC" ? "BASIC" : "PROFESSIONAL"}
+            />
           </CardFooter>
         </Card>
       ))}
