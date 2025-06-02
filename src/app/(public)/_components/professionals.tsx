@@ -10,10 +10,17 @@ import Image from "next/image";
 import clinicaImg from "../../../../public/foto1.png";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { User } from "@prisma/client";
+import { Prisma } from "@prisma/client";
+import { PremiumCardBadge } from "./premium-badge";
+
+type UserWithSubscription = Prisma.UserGetPayload<{
+  include: {
+    subscription: true;
+  };
+}>;
 
 interface ProfessionalsProps {
-  professionals: User[];
+  professionals: UserWithSubscription[];
 }
 
 export function Professionals({ professionals }: ProfessionalsProps) {
@@ -25,7 +32,10 @@ export function Professionals({ professionals }: ProfessionalsProps) {
         </h2>
         <section className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {professionals.map((clinic) => (
-            <Card key={clinic.id} className="p-0 overflow-hidden hover:shadow-lg duration-300">
+            <Card
+              key={clinic.id}
+              className="p-0 overflow-hidden hover:shadow-lg duration-300"
+            >
               <CardContent className="p-0">
                 <div>
                   <div className="relative h-48">
@@ -35,17 +45,21 @@ export function Professionals({ professionals }: ProfessionalsProps) {
                       fill
                       className="object-cover"
                     />
+
+                    {clinic?.subscription?.status === "active" &&
+                      clinic?.subscription?.plan === "PROFESSIONAL" && (
+                        <PremiumCardBadge />
+                      )}
                   </div>
                 </div>
-                <div className="p-4 space-y-4">
+                <div className="min-h-[160px] flex flex-col justify-between p-4 space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
                       <h3 className="font-semibold">{clinic.name}</h3>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-gray-500 line-clamp-2">
                         {clinic.address ?? "Endereço não informado"}
                       </p>
                     </div>
-                    <div className="w-2.5 h-2.5 rounded-full bg-emerald-500"></div>
                   </div>
                   <Link
                     href={`/clinica/${clinic.id}`}

@@ -28,8 +28,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-import Image from "next/image";
-import imgTest from "../../../../../../public/foto1.png";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { useState } from "react";
@@ -40,6 +38,7 @@ import { toast, Toaster } from "sonner";
 import { formatPhone } from "@/utils/formatPhone";
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { ProfileAvatar } from "./profile-avatar";
 
 type UserWithSubscription = Prisma.UserGetPayload<{
   include: {
@@ -70,7 +69,7 @@ export function ProfileContent({ user }: ProfileContentProps) {
   function generateTimeSlots(): string[] {
     const hours: string[] = [];
 
-    for (let i = 8; i <= 24; i++) {
+    for (let i = 7; i <= 23; i++) {
       for (let j = 0; j < 2; j++) {
         const hour = i.toString().padStart(2, "0");
         const minute = (j * 30).toString().padStart(2, "0");
@@ -136,14 +135,7 @@ export function ProfileContent({ user }: ProfileContentProps) {
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="flex justify-center ">
-                <div className="bg-gray-200 relative h-40 w-40 rounded-full overflow-hidden">
-                  <Image
-                    src={user.image ? user.image : imgTest}
-                    alt="foto da clinica"
-                    fill
-                    className="object-cover"
-                  />
-                </div>
+                <ProfileAvatar avatarUrl={user.image} userId={user.id} />
               </div>
               <div className="space-y-4">
                 <FormField
