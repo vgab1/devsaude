@@ -18,6 +18,15 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "DevSaúde - Agilizando o seu atendimento",
   description: "Plataforma para profissionais da saúde",
+  robots: {
+    index: true,
+    follow: true,
+    nocache: true,
+  },
+  openGraph: {
+    title: "DevSaúde - Agilizando o seu atendimento",
+    description: "Plataforma para profissionais da saúde",
+  },
 };
 
 export default function RootLayout({

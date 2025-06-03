@@ -16,7 +16,7 @@ export function GridPlans() {
       {subscriptionPlans.map((plan, index) => (
         <Card
           key={plan.id}
-          className={`flex flex-col w-full mx-auto ${
+          className={`flex flex-col justify-between w-full mx-auto ${
             index === 1 && "pt-0 border-emerald-500"
           }`}
         >
