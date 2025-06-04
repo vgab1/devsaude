@@ -39,7 +39,7 @@
 
 ```bash
 # Clone o repositório
-git clone https://github.com/seu-usuario/devsaude.git
+git clone https://github.com/vgab1/devsaude.git
 cd devsaude
 
 # Instale as dependências
