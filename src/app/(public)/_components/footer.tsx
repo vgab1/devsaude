@@ -6,7 +6,7 @@ export function Footer() {
       <p>
         Todos os direitos reservados &copy; {new Date().getFullYear()} -{" "}
         <Link
-          href="#"
+          href="https://www.instagram.com/vgabrielso/"
           target="_blank"
           className="text-gray-900 hover:text-emerald-700 font-semibold"
         >
